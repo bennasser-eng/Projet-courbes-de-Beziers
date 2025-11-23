@@ -1,9 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+
+
+
 class Courbure:
     def __init__(self):
-        # Points pour former un cœur
+        # Points pour former un objet:
         self.points = np.array([
             [1, 0],
             [1, 2],
@@ -15,9 +18,20 @@ class Courbure:
             [3, -2],
             [1, 0]
         ])
+        """
+
+        self.points = np.array([
+            [0,0],
+            [3,2],
+            [2,1],
+            [1,3],
+            [3,4],
+            [2,5]
+        ])"""
         
         # Paramétrisation équidistante
         self.u = np.arange(len(self.points))
+
 
     def run_hermite(self, c=0.5, methode="cardinal"):
         """Spline Hermite cubique avec calcul de courbure"""
@@ -28,8 +42,8 @@ class Courbure:
         # 1. Calcul des tangentes
         if methode == "cardinal":
             tangents = self._compute_cardinal_tangents(c)
-        else:  # bessel
-            tangents = self.bessel_tangents()  # Correction: enlever u en paramètre
+        else:         # bessel
+            tangents = self.bessel_tangents()
         
         # 2. Génération de la courbe segment par segment
         curve_points = []
@@ -54,6 +68,8 @@ class Courbure:
         
         return np.array(curve_points), np.array(curvatures)
 
+
+
     def _compute_cardinal_tangents(self, c):
         """Calcule les tangentes avec Cardinal splines"""
         n = len(self.points)
@@ -70,6 +86,7 @@ class Courbure:
         tangents.append((1 - c) * (self.points[-1] - self.points[-2]) / (self.u[-1] - self.u[-2]))
         
         return tangents
+
 
     def bessel_tangents(self):
         """Méthode de Bessel - interpolation quadratique"""
@@ -94,6 +111,7 @@ class Courbure:
             tangents.append(tangent)
         
         return tangents
+
 
     def _compute_hermite_segment(self, Pk, Pk1, mk, mk1, hk, u_start, num_points=100):
         """Calcule un segment de spline Hermite avec sa courbure"""
@@ -122,6 +140,7 @@ class Courbure:
         
         return segment_points, segment_curvatures, segment_u
 
+
     def _hermite_to_polynomial(self, pk, pk1, mk, mk1, hk):
         """Convertit la forme Hermite en forme polynomiale standard"""
         a = 2*pk - 2*pk1 + hk*mk + hk*mk1
@@ -144,6 +163,7 @@ class Courbure:
             return 0.0
         else:
             return numerator / denominator * hk
+
 
     def compare_all(self):
         """Compare différentes configurations Hermite"""
@@ -175,6 +195,8 @@ class Courbure:
         
         plt.tight_layout()
         plt.show()
+
+
 
 # Test
 experiment = Courbure()

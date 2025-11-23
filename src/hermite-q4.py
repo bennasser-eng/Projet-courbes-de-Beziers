@@ -1,7 +1,7 @@
 """
 Splines Hermite Cubiques:
 * L'utilsateur peut choisir la parametrisation qu'il veut :chordale, centridède ou equidistante 
-* aussi , peut choisir le parametre de tension c
+* aussi , peut choisir le parametre de tension c 
 * mais peut pas choisir les valeurs de m0 et mN , car ils sont calculées automatiquement 
 c'est mieux de coté stabilité numérique
 * Choix initial entre bessel_tangents et Cardinal Splines
@@ -19,7 +19,7 @@ class HermiteSplineEditor(Tk):
         self.geometry("1000x800")
 
         self._selected_data = {"x": 0, "y": 0, 'item': None}
-        self.radius = 8      #rayon des points   
+        self.radius = 8           #rayon des points   
         
         # Paramètres Hermite (initialisés après choix)
         self.tangent_method = None
@@ -33,6 +33,10 @@ class HermiteSplineEditor(Tk):
         # Premier choix de méthode
         self.choose_method_and_setup()
 
+
+
+
+
     def choose_method_and_setup(self):
         """Choisir la méthode et setup l'interface"""
         method = self.choose_tangent_method()
@@ -43,6 +47,9 @@ class HermiteSplineEditor(Tk):
         self.tangent_method = method
         self.setup_canvas()
         self.setup_control_panel()
+
+
+
 
     def choose_tangent_method(self):
         """Fenêtre de choix de la méthode"""
@@ -73,6 +80,9 @@ class HermiteSplineEditor(Tk):
         self.wait_window(choice_window)
         return method.get()
 
+
+
+
     def setup_canvas(self):
         """Setup du canvas de dessin"""
         if self.canvas:
@@ -84,6 +94,10 @@ class HermiteSplineEditor(Tk):
         self.canvas.bind('<Button-1>', self.handle_canvas_click)
         self.canvas.tag_bind("control_points", "<ButtonRelease-1>", self.handle_drag_stop)
         self.canvas.bind("<B1-Motion>", self.handle_drag)
+
+
+
+
 
     def setup_control_panel(self):
         """Setup du panneau de contrôle"""
@@ -126,6 +140,13 @@ class HermiteSplineEditor(Tk):
         # Bouton reset
         Button(self.control_panel, text="Reset", command=self.reset_all).pack(side=RIGHT, padx=5)
 
+
+
+
+
+
+
+###---------------------------------------------------------------------------###
     # === MÉTHODES HERMITE ===
     
     def compute_parameters(self, points):
@@ -139,11 +160,14 @@ class HermiteSplineEditor(Tk):
             elif self.parametrization.get() == "chordal":
                 dist = np.linalg.norm(np.array(points[i]) - np.array(points[i-1]))
                 u.append(u[-1] + dist)
-            else:  # centripetal
+            else:                               # centripetal
                 dist = np.linalg.norm(np.array(points[i]) - np.array(points[i-1]))
                 u.append(u[-1] + np.sqrt(dist))
         
         return np.array(u)
+    
+
+
 
     
     def compute_hermite_tangents(self, points, u):
@@ -152,6 +176,10 @@ class HermiteSplineEditor(Tk):
             return self.cardinal_tangents(points, u)
         else:
             return self.bessel_tangents(points, u)
+
+
+
+
 
     def cardinal_tangents(self, points, u):
         """Calcule les tangentes avec Cardinal Splines"""
@@ -175,6 +203,9 @@ class HermiteSplineEditor(Tk):
         else:
             return [np.array([0,0])] * n
 
+
+
+
     def bessel_tangents(self, points, u):
         """Méthode de Bessel - interpolation quadratique"""
         n = len(points)
@@ -196,6 +227,9 @@ class HermiteSplineEditor(Tk):
             tangents.append(tangent)
         
         return tangents
+
+
+
 
     def hermite_spline(self, points, T):
         """Spline Hermite cubique complète"""
@@ -238,6 +272,11 @@ class HermiteSplineEditor(Tk):
         
         return np.array(result)
 
+
+
+
+
+###----------------------------------------------------------------------------###
     # === MÉTHODES D'INTERFACE ===
     
     def get_points(self):
@@ -248,6 +287,7 @@ class HermiteSplineEditor(Tk):
                 points.append([float(coords[0] + self.radius), float(coords[1] + self.radius)])
         return points
 
+
     def create_point(self, x, y):
         if not self.canvas:
             return None
@@ -255,6 +295,7 @@ class HermiteSplineEditor(Tk):
                                       x + self.radius, y + self.radius,
                                       outline="red", fill="red", tags="control_points")
         return item
+
 
     def draw_curve(self):
         if not self.canvas:
@@ -274,6 +315,7 @@ class HermiteSplineEditor(Tk):
                                    curve[i + 1, 0], curve[i + 1, 1],
                                    fill="green", width=3, tags="curve")
 
+
     def find_closest_point(self, x, y, radius):
         if not self.canvas:
             return (None, [0, 0], float("inf"))
@@ -284,6 +326,7 @@ class HermiteSplineEditor(Tk):
             if dist <= radius**2:
                 distances.append((item, coords, dist))
         return min(distances, default=(None, [0, 0], float("inf")), key=lambda p: p[2])
+
 
     def handle_canvas_click(self, event):
         if not self.canvas:
@@ -297,11 +340,13 @@ class HermiteSplineEditor(Tk):
         self._selected_data['item'] = item
         self.update_display()
 
+
     def handle_drag_stop(self, event):
         if self._selected_data['item'] is not None:
             if self.canvas:
                 self.canvas.itemconfig(self._selected_data['item'], fill='red')
             self._selected_data['item'] = None
+
 
     def handle_drag(self, event):
         if self._selected_data['item'] is None or not self.canvas:
@@ -316,8 +361,10 @@ class HermiteSplineEditor(Tk):
                               event.x + self.radius, event.y + self.radius)
             self.update_display()
 
+
     def update_display(self, event=None):
         self.draw_curve()
+
 
     def reset_all(self):
         """Reset complet avec rechoisir la méthode"""
@@ -331,6 +378,8 @@ class HermiteSplineEditor(Tk):
         
         # Rechoisir la méthode et refaire le setup
         self.choose_method_and_setup()
+
+###---------------------------------------------------------------------###
 
 if __name__ == "__main__":
     app = HermiteSplineEditor()

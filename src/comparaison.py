@@ -1,9 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 class ComparisonExperiment:
     def __init__(self):
-        # Points pour former un cœur
+        # Points pour former un objet:
         """self.points = np.array([
             [1, 0],
             [1, 2],
@@ -15,7 +16,10 @@ class ComparisonExperiment:
             [3, -2],
             [1, 0]
         ])
-        """
+        
+
+
+        
         self.points = np.array([
             [0,0],
             [4,2],
@@ -23,10 +27,10 @@ class ComparisonExperiment:
             [2,5],
             [1,4],
             [0,0]
-
         ])
 
-        """self.points = np.array([
+        
+        self.points = np.array([
             [0, 0],
             [1, 2],
             [3, 5],
@@ -40,13 +44,42 @@ class ComparisonExperiment:
             [2, 6],
             [1, 1],
             [0, 0]
-        ])"""
+        ])
         
+
+        self.points = np.array([
+            [0, 0],
+            [1, 4],
+            [3, 10],
+            [5, 1],
+            [7, 0],
+            [8, 3],
+            [9, 7],
+            [7, 4],
+            [5, 8],
+            [3, 3],
+            [2, 3],
+            [1, 1],
+            [2, 4],
+            [1, 10],
+            [0, 0]
+        ])"""
+
+        self.points = np.array([
+            [0,0],
+            [3,2],
+            [2,1],
+            [1,3]
+        ])
+
+
         # Paramétrisation équidistante
         self.u = np.arange(len(self.points))
 
+
+
     def _compute_numerical_curvature(self, curve_points, u_values):
-        """Calcule la courbure par différences finies - MANQUANT"""
+        """Calcule la courbure par différences finies"""
         n = len(curve_points)
         if n < 3:
             return np.zeros(n)
@@ -68,6 +101,8 @@ class ComparisonExperiment:
         curvatures[mask] = numerator[mask] / denominator[mask]
         
         return curvatures
+
+
 
     def run_hermite(self, c=0.5):
         """Spline Hermite cubique avec calcul de courbure"""
@@ -101,6 +136,7 @@ class ComparisonExperiment:
         
         return np.array(curve_points), np.array(curvatures)
 
+
     def _compute_cardinal_tangents(self, c):
         """Calcule les tangentes avec Cardinal splines"""
         n = len(self.points)
@@ -117,6 +153,7 @@ class ComparisonExperiment:
         tangents.append((1 - c) * (self.points[-1] - self.points[-2]) / (self.u[-1] - self.u[-2]))
         
         return tangents
+
 
     def _compute_hermite_segment(self, Pk, Pk1, mk, mk1, hk, u_start, num_points=100):
         """Calcule un segment de spline Hermite avec sa courbure"""
@@ -145,6 +182,7 @@ class ComparisonExperiment:
         
         return segment_points, segment_curvatures, segment_u
 
+
     def _hermite_to_polynomial(self, pk, pk1, mk, mk1, hk):
         """Convertit la forme Hermite en forme polynomiale standard"""
         a = 2*pk - 2*pk1 + hk*mk + hk*mk1
@@ -152,6 +190,7 @@ class ComparisonExperiment:
         c = hk*mk
         d = pk
         return a, b, c, d
+
 
     def _compute_curvature(self, t, ax, bx, cx, ay, by, cy, hk):
         """Calcule la courbure au paramètre t"""
@@ -170,13 +209,12 @@ class ComparisonExperiment:
         if abs(denominator) < 1e-12:
             return 0.0  # Évite la division par zéro
         else:
-            return numerator / denominator * hk  # Correction due au changement de paramètre
+            return numerator / denominator * hk 
+        
 
 
 
-
-
-
+###-------------------------------------------------------------###
 
     def run_lagrange(self):
         """Interpolation polynomiale de Lagrange (version optimisée)"""
@@ -199,6 +237,7 @@ class ComparisonExperiment:
         
         return curve_points, curvatures
 
+
     def _lagrange_interpolation(self, u_eval, u_nodes, values):
         """Interpolation de Lagrange vectorisée"""
         n = len(u_nodes)
@@ -218,7 +257,7 @@ class ComparisonExperiment:
 
 
 
-
+###-----------------------------------------------------------------------###
 
     def run_c2_spline(self):
         """Spline cubique C² naturelle avec paramétrisation équidistante"""
@@ -244,6 +283,7 @@ class ComparisonExperiment:
             u_global.extend(segment_u)
         
         return np.array(curve_points), np.array(curvatures)
+
 
     def _solve_natural_spline_system(self):
         """Résout le système tridiagonal pour les splines naturelles C²"""
@@ -273,6 +313,7 @@ class ComparisonExperiment:
         M_y = np.linalg.solve(A, b_y)
         
         return np.column_stack([M_x, M_y])
+
 
     def _compute_c2_segment(self, i, second_derivs):
         """Calcule un segment de spline C²"""
@@ -304,6 +345,7 @@ class ComparisonExperiment:
     
         return segment_points, segment_curvatures, segment_u
 
+
     def _c2_spline_formula(self, t, P0, P1, M0, M1, h):
         """Formule de la spline cubique C² sur un segment"""
         a = (M1 - M0) / (6 * h)
@@ -313,6 +355,7 @@ class ComparisonExperiment:
         
         point = a * (h * t)**3 + b * (h * t)**2 + c * (h * t) + d
         return point
+
 
     def _c2_curvature(self, t, P0, P1, M0, M1, h):
         """Calcule la courbure pour une spline C²"""
@@ -343,11 +386,7 @@ class ComparisonExperiment:
 
 
 
-
-
-
-
-
+###-------------------------------------------------------------###
 
     def compare_all(self):
         """Compare les 3 méthodes sur les mêmes points"""
@@ -377,6 +416,7 @@ class ComparisonExperiment:
         
         plt.tight_layout()
         plt.show()
+
 
 # Lancement de l'expérience
 experiment = ComparisonExperiment()
